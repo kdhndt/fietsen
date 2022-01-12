@@ -4,6 +4,12 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/*@NamedQuery(name = "Docent.findByWeddeBetween",
+        query = """
+                select d from Docent d
+                where d.wedde between :van and :tot
+                order by d.wedde, d.id
+                """)*/
 @Entity
 @Table(name = "docenten")
 public class Docent {
@@ -28,7 +34,8 @@ public class Docent {
 
     //default constructor (constructor zonder parameters) is nodig omdat we zelf een constructor typen, JPA heeft deze nodig voor zijn interne werking
     //protected volstaat, public kan zorgen voor per ongeluk fouten maken, bv. een leeg Docent object aanmaken
-    protected Docent() {}
+    protected Docent() {
+    }
 
     public void opslag(BigDecimal percentage) {
         if (percentage.compareTo(BigDecimal.ZERO) <= 0) {
