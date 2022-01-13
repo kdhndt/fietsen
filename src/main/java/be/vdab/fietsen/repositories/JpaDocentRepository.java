@@ -71,5 +71,13 @@ class JpaDocentRepository implements DocentRepository {
                 .getResultList();
     }
 
+    @Override
+    public int algemeneOpslag(BigDecimal percentage) {
+        return manager.createNamedQuery("Docent.algemeneOpslag")
+                .setParameter("percentage", percentage)
+                //update voert uit en geeft aantal gewijzigd terug
+                .executeUpdate();
+    }
+
 
 }
