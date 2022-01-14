@@ -3,6 +3,9 @@ package be.vdab.fietsen.domain;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /*@NamedQuery(name = "Docent.findByWeddeBetween",
         query = """
@@ -10,6 +13,8 @@ import java.math.RoundingMode;
                 where d.wedde between :van and :tot
                 order by d.wedde, d.id
                 """)*/
+
+
 @Entity
 @Table(name = "docenten")
 public class Docent {
@@ -22,6 +27,10 @@ public class Docent {
     private String emailAdres;
     @Enumerated(EnumType.STRING)
     private Geslacht geslacht;
+    @ElementCollection
+    @CollectionTable(name = "docentenbijnamen", joinColumns = @JoinColumn(name = "docentId"))
+    @Column(name = "bijnaam")
+    private Set<String> bijnamen;
 
     //zonder id, database maakt die aan, JPA vult hiermee daarna de variabele
     public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht) {
@@ -30,11 +39,29 @@ public class Docent {
         this.wedde = wedde;
         this.emailAdres = emailAdres;
         this.geslacht = geslacht;
+        this.bijnamen = new LinkedHashSet<>();
     }
 
     //default constructor (constructor zonder parameters) is nodig omdat we zelf een constructor typen, JPA heeft deze nodig voor zijn interne werking
     //protected volstaat, public kan zorgen voor per ongeluk fouten maken, bv. een leeg Docent object aanmaken
     protected Docent() {
+    }
+
+    public boolean addBijnaam(String bijnaam) {
+        if (bijnaam.trim().isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return bijnamen.add(bijnaam);
+    }
+
+    public boolean removeBijnaam(String bijnaam) {
+        return bijnamen.remove(bijnaam);
+    }
+
+    public Set<String> getBijnamen() {
+//        return bijnamen;
+        //getter geeft op deze manier een read-only voorstelling terug van de verzameling, zo kan je niet per ongeluk een .add of .remove erna typen
+    return Collections.unmodifiableSet(bijnamen);
     }
 
     public void opslag(BigDecimal percentage) {
