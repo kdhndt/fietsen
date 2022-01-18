@@ -1,8 +1,7 @@
 package be.vdab.fietsen.repositories;
 
-import be.vdab.fietsen.domain.Adres;
-import be.vdab.fietsen.domain.Campus;
-import be.vdab.fietsen.domain.TelefoonNr;
+import be.vdab.fietsen.domain.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -10,6 +9,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 import javax.persistence.EntityManager;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,13 +50,15 @@ class JpaCampusRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
                 });
     }
 
-    @Test void telefoonNrsLezen() {
+    @Test
+    void telefoonNrsLezen() {
         assertThat(repository.findById(idVanTestCampus()))
                 .hasValueSatisfying(campus -> assertThat(campus.getTelefoonNrs()).containsOnly(new TelefoonNr("1", false, "test")));
     }
 
     //zelf toegevoegd
-    @Test void telefoonNrToevoegen() {
+    @Test
+    void telefoonNrToevoegen() {
         var campus = new Campus("test", new Adres("test", "test", "test", "test"));
         repository.create(campus);
         campus.addTelefoonNr(new TelefoonNr("1", false, "test"));

@@ -13,12 +13,22 @@ import static org.junit.jupiter.api.Assertions.*;
 class DocentTest {
     private final static BigDecimal WEDDE = BigDecimal.valueOf(200);
     private Docent docent1;
+    private Docent docent2;
+    private Docent docent3;
     private Campus campus1;
 
     @BeforeEach
     void beforeEach() {
         campus1 = new Campus("test", new Adres("test", "test", "test", "test"));
-        docent1 = new Docent("test", "test", WEDDE, "test@test.be", Geslacht.MAN, campus1);
+        docent1 = new Docent("test", "test", WEDDE, "test@test.be", Geslacht.MAN/*, campus1*/);
+        docent2 = new Docent("test2", "test2", WEDDE, "test2@test.be", Geslacht.MAN/*, campus1*/);
+        docent3 = new Docent("test2", "test2", WEDDE, "TEst2@test.be", Geslacht.MAN/*, campus1*/);
+    }
+
+    @Test void meerdereDocentenKunnenTotDezelfdeCampusBehoren() {
+        assertThat(campus1.add(docent1)).isTrue();
+        assertThat(campus1.add(docent2)).isTrue();
+        assertThat(campus1.add(docent3)).isFalse();
     }
 
     @Test

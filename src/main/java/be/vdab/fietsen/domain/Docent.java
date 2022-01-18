@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /*@NamedQuery(name = "Docent.findByWeddeBetween",
@@ -35,21 +36,22 @@ public class Docent {
     //een campus heeft meerdere docenten
     //optional = false throwt exception als campus niet ingevuld is
     //lazy loading ipv eager, zoekt enkel bijbehorende campus informatie wanneer nodig
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+
+/*    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "campusId")
     //datatype Campus, groot verschil met Database (campusId), maar zo heb je toegang tot de campus eigenschappen
-    private Campus campus;
+    private Campus campus;*/
 
 
     //zonder id, database maakt die aan, JPA vult hiermee daarna de variabele
-    public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht, Campus campus) {
+    public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht/*, Campus campus*/) {
         this.voornaam = voornaam;
         this.familienaam = familienaam;
         this.wedde = wedde;
         this.emailAdres = emailAdres;
         this.geslacht = geslacht;
         this.bijnamen = new LinkedHashSet<>();
-        setCampus(campus);
+//        setCampus(campus);
     }
 
     //default constructor (constructor zonder parameters) is nodig omdat we zelf een constructor typen, JPA heeft deze nodig voor zijn interne werking
@@ -57,14 +59,14 @@ public class Docent {
     protected Docent() {
     }
 
-    public Campus getCampus() {
+/*    public Campus getCampus() {
         return campus;
     }
 
     //doel: BESTAANDE docent verandert van campus
     public void setCampus(Campus campus) {
         this.campus = campus;
-    }
+    }*/
 
     public boolean addBijnaam(String bijnaam) {
         if (bijnaam.trim().isEmpty()) {
@@ -114,4 +116,28 @@ public class Docent {
     public Geslacht getGeslacht() {
         return geslacht;
     }
+
+/*    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Docent)) return false;
+        Docent docent = (Docent) o;
+        return Objects.equals(emailAdres, docent.emailAdres);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(emailAdres);
+    }*/
+
+    @Override
+    public boolean equals(Object object) {
+        return object instanceof Docent docent &&
+                emailAdres.equalsIgnoreCase(docent.emailAdres);
+    }
+    @Override
+    public int hashCode() {
+        return emailAdres == null ? 0 : emailAdres.toLowerCase().hashCode();
+    }
+
 }

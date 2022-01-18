@@ -33,7 +33,8 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
     @BeforeEach
     void beforeEach() {
         campus = new Campus("test", new Adres("test", "test", "test", "test"));
-        docent = new Docent("test", "test", BigDecimal.TEN, "test@test.be", Geslacht.MAN, campus);
+        docent = new Docent("test", "test", BigDecimal.TEN, "test@test.be", Geslacht.MAN/*, campus*/);
+        campus.add(docent);
     }
 
     JpaDocentRepositoryTest(JpaDocentRepository repository, EntityManager manager) {
@@ -77,9 +78,14 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
         //insert campus?
         manager.persist(campus);
         repository.create(docent);
+        //direct committen zodat de update (docent toevoegen aan campus) doorgevoerd wordt
+        manager.flush();
         assertThat(docent.getId()).isPositive();
         assertThat(countRowsInTableWhere(DOCENTEN, "id=" + docent.getId() + " and campusId = " + campus.getId())).isOne();
+        //test equals()
+        assertThat(campus.getDocenten().contains(docent)).isTrue();
     }
+
     @Test
     void delete() {
         var id = idVanTestMan();
@@ -159,10 +165,11 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
         manager.flush();
         assertThat(countRowsInTableWhere(DOCENTEN_BIJNAMEN, "bijnaam = 'test' and docentId=" + docent.getId())).isOne();
     }
-
+/*
+    //zie 'Run' tab om te zien welke records worden gelezen
     @Test void campusLazyLoading() {
         assertThat(repository.findById(idVanTestMan())).
                 hasValueSatisfying(docent -> assertThat(docent.getCampus().getNaam()).isEqualTo("test"));
-    }
+    }*/
 
 }
