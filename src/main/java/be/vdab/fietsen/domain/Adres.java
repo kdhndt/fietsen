@@ -8,6 +8,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 @Access(AccessType.FIELD)
 public class Adres {
+    //geen variabele die verwijst naar bijbehorende object(en), zo is deze class herbruikbaar bij andere entity classes
     private String straat;
     private String huisNr;
     private String postcode;

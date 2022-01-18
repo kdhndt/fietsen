@@ -28,6 +28,7 @@ public class Docent {
     @Enumerated(EnumType.STRING)
     private Geslacht geslacht;
     @ElementCollection
+    //primary key uit je docenten table wordt als foreign key gebruikt in de nieuwe, aparte table met als kolom naam docentId
     @CollectionTable(name = "docentenbijnamen", joinColumns = @JoinColumn(name = "docentId"))
     @Column(name = "bijnaam")
     private Set<String> bijnamen;

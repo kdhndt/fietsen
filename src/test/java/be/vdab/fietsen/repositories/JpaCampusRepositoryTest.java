@@ -2,15 +2,16 @@ package be.vdab.fietsen.repositories;
 
 import be.vdab.fietsen.domain.Adres;
 import be.vdab.fietsen.domain.Campus;
-import org.assertj.core.api.Assertions;
+import be.vdab.fietsen.domain.TelefoonNr;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
+import javax.persistence.EntityManager;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest(showSql = false)
 @Import(JpaCampusRepository.class)
@@ -18,9 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class JpaCampusRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
     private static final String CAMPUSSEN = "campussen";
     private JpaCampusRepository repository;
+    private final EntityManager manager;
+    private static final String CAMPUSSENTELEFOONNRS = "campussentelefoonnrs";
 
-    public JpaCampusRepositoryTest(JpaCampusRepository repository) {
+
+    public JpaCampusRepositoryTest(JpaCampusRepository repository, EntityManager manager) {
         this.repository = repository;
+        this.manager = manager;
     }
 
     private long idVanTestCampus() {
@@ -42,5 +47,19 @@ class JpaCampusRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
                     assertThat(campus.getNaam()).isEqualTo("test");
                     assertThat(campus.getAdres().getGemeente()).isEqualTo("test");
                 });
+    }
+
+    @Test void telefoonNrsLezen() {
+        assertThat(repository.findById(idVanTestCampus()))
+                .hasValueSatisfying(campus -> assertThat(campus.getTelefoonNrs()).containsOnly(new TelefoonNr("1", false, "test")));
+    }
+
+    //zelf toegevoegd
+    @Test void telefoonNrToevoegen() {
+        var campus = new Campus("test", new Adres("test", "test", "test", "test"));
+        repository.create(campus);
+        campus.addTelefoonNr(new TelefoonNr("1", false, "test"));
+        manager.flush();
+        assertThat(countRowsInTableWhere(CAMPUSSENTELEFOONNRS, "opmerking = 'test' and campusId=" + campus.getId())).isOne();
     }
 }
