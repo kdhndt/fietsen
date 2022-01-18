@@ -32,20 +32,38 @@ public class Docent {
     @CollectionTable(name = "docentenbijnamen", joinColumns = @JoinColumn(name = "docentId"))
     @Column(name = "bijnaam")
     private Set<String> bijnamen;
+    //een campus heeft meerdere docenten
+    //optional = false throwt exception als campus niet ingevuld is
+    //lazy loading ipv eager, zoekt enkel bijbehorende campus informatie wanneer nodig
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "campusId")
+    //datatype Campus, groot verschil met Database (campusId), maar zo heb je toegang tot de campus eigenschappen
+    private Campus campus;
+
 
     //zonder id, database maakt die aan, JPA vult hiermee daarna de variabele
-    public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht) {
+    public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht, Campus campus) {
         this.voornaam = voornaam;
         this.familienaam = familienaam;
         this.wedde = wedde;
         this.emailAdres = emailAdres;
         this.geslacht = geslacht;
         this.bijnamen = new LinkedHashSet<>();
+        setCampus(campus);
     }
 
     //default constructor (constructor zonder parameters) is nodig omdat we zelf een constructor typen, JPA heeft deze nodig voor zijn interne werking
     //protected volstaat, public kan zorgen voor per ongeluk fouten maken, bv. een leeg Docent object aanmaken
     protected Docent() {
+    }
+
+    public Campus getCampus() {
+        return campus;
+    }
+
+    //doel: BESTAANDE docent verandert van campus
+    public void setCampus(Campus campus) {
+        this.campus = campus;
     }
 
     public boolean addBijnaam(String bijnaam) {

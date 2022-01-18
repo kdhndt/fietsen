@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 //JpaDocentRepository bean kan niet worden geladen met @Import vanwege package visibility
 //value = package, resourcePattern = naam van de class van de bean
 @ComponentScan(value = "be.vdab.fietsen.repositories", resourcePattern = "JpaDocentRepository.class")
-@Sql("/insertDocent.sql")
+@Sql({"/insertCampus.sql", "/insertDocent.sql"})
 //integration test = test de samenwerking tussen service en database (JpaDocentRepository)
 class DefaultDocentServiceIntegrationTest extends AbstractTransactionalJUnit4SpringContextTests {
     private final static String DOCENTEN = "docenten";

@@ -1,5 +1,7 @@
 package be.vdab.fietsen.services;
 
+import be.vdab.fietsen.domain.Adres;
+import be.vdab.fietsen.domain.Campus;
 import be.vdab.fietsen.domain.Docent;
 import be.vdab.fietsen.domain.Geslacht;
 import be.vdab.fietsen.exceptions.DocentNietGevondenException;
@@ -35,7 +37,8 @@ class DefaultDocentServiceTest {
     void beforeEach() {
         //injecteer de mock
         service = new DefaultDocentService(repository);
-        docent = new Docent("test", "test", BigDecimal.valueOf(100), "test@test.be", Geslacht.MAN);
+        var campus = new Campus("test", new Adres("test", "test", "test", "test"));
+        docent = new Docent("test", "test", BigDecimal.valueOf(100), "test@test.be", Geslacht.MAN, campus);
     }
 
     @Test

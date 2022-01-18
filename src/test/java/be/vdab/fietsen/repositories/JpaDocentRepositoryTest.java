@@ -1,5 +1,7 @@
 package be.vdab.fietsen.repositories;
 
+import be.vdab.fietsen.domain.Adres;
+import be.vdab.fietsen.domain.Campus;
 import be.vdab.fietsen.domain.Docent;
 import be.vdab.fietsen.domain.Geslacht;
 import be.vdab.fietsen.projections.AantalDocentenPerWedde;
@@ -17,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest(showSql = false)
 //voorkom dubbel loggen van SQL statements (zie application.properties)
-@Sql("/insertDocent.sql")
+@Sql({"/insertCampus.sql", "/insertDocent.sql"})
 @Import(JpaDocentRepository.class)
 //onderstaande inheritance laat gebruik van de jdbcTemplate hier toe
 class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -26,10 +28,12 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
     private Docent docent;
     private final EntityManager manager;
     private static final String DOCENTEN_BIJNAMEN = "docentenbijnamen";
+    private Campus campus;
 
     @BeforeEach
     void beforeEach() {
-        docent = new Docent("test", "test", BigDecimal.TEN, "test@test.be", Geslacht.MAN);
+        campus = new Campus("test", new Adres("test", "test", "test", "test"));
+        docent = new Docent("test", "test", BigDecimal.TEN, "test@test.be", Geslacht.MAN, campus);
     }
 
     JpaDocentRepositoryTest(JpaDocentRepository repository, EntityManager manager) {
@@ -70,9 +74,11 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
 
     @Test
     void create() {
+        //insert campus?
+        manager.persist(campus);
         repository.create(docent);
         assertThat(docent.getId()).isPositive();
-        assertThat(countRowsInTableWhere(DOCENTEN, "id=" + docent.getId())).isOne();
+        assertThat(countRowsInTableWhere(DOCENTEN, "id=" + docent.getId() + " and campusId = " + campus.getId())).isOne();
     }
     @Test
     void delete() {
@@ -147,10 +153,16 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
     }
 
     @Test void bijnaamToevoegen() {
+        manager.persist(campus);
         repository.create(docent);
         docent.addBijnaam("test");
         manager.flush();
         assertThat(countRowsInTableWhere(DOCENTEN_BIJNAMEN, "bijnaam = 'test' and docentId=" + docent.getId())).isOne();
+    }
+
+    @Test void campusLazyLoading() {
+        assertThat(repository.findById(idVanTestMan())).
+                hasValueSatisfying(docent -> assertThat(docent.getCampus().getNaam()).isEqualTo("test"));
     }
 
 }
