@@ -16,19 +16,38 @@ class DocentTest {
     private Docent docent2;
     private Docent docent3;
     private Campus campus1;
+    private Campus campus2;
 
     @BeforeEach
     void beforeEach() {
         campus1 = new Campus("test", new Adres("test", "test", "test", "test"));
-        docent1 = new Docent("test", "test", WEDDE, "test@test.be", Geslacht.MAN/*, campus1*/);
-        docent2 = new Docent("test2", "test2", WEDDE, "test2@test.be", Geslacht.MAN/*, campus1*/);
-        docent3 = new Docent("test2", "test2", WEDDE, "TEst2@test.be", Geslacht.MAN/*, campus1*/);
+        docent1 = new Docent("test", "test", WEDDE, "test@test.be", Geslacht.MAN, campus1);
+        docent2 = new Docent("test2", "test2", WEDDE, "test2@test.be", Geslacht.MAN, campus1);
+//        docent3 = new Docent("test2", "test2", WEDDE, "TEst2@test.be", Geslacht.MAN, campus1);
+        campus2 = new Campus("test2", new Adres("test2", "test2", "test2", "test2"));
+    }
+
+    @Test void docent1KomtVoorInCampus1() {
+        assertThat(campus1.getDocenten()).contains(docent1);
+        assertThat(docent1.getCampus()).isEqualTo(campus1);
+    }
+
+    @Test void docent1VerhuistVanCampus1NaarCampus2() {
+        docent1.setCampus(campus2);
+        assertThat(campus2.getDocenten()).containsOnly(docent1);
+        assertThat(docent1.getCampus()).isEqualTo(campus2);
+        assertThat(campus1.getDocenten()).doesNotContain(docent1);
+    }
+
+    @Test void eenNullCampusInDeSetterMislukt() {
+        assertThatNullPointerException().isThrownBy(() -> docent1.setCampus(null));
     }
 
     @Test void meerdereDocentenKunnenTotDezelfdeCampusBehoren() {
-        assertThat(campus1.add(docent1)).isTrue();
-        assertThat(campus1.add(docent2)).isTrue();
-        assertThat(campus1.add(docent3)).isFalse();
+//        assertThat(campus1.add(docent1)).isTrue();
+//        assertThat(campus1.add(docent2)).isTrue();
+//        assertThat(campus1.add(docent3)).isFalse();
+        assertThat(campus1.getDocenten()).containsOnly(docent1, docent2);
     }
 
     @Test
@@ -36,6 +55,7 @@ class DocentTest {
         docent1.opslag(BigDecimal.TEN);
         assertThat(docent1.getWedde()).isEqualByComparingTo("220");
     }
+
     @Test
     void opslagMetNullMislukt() {
         assertThatNullPointerException().isThrownBy(() -> docent1.opslag(null));

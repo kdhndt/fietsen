@@ -33,6 +33,13 @@ class JpaCampusRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
         return jdbcTemplate.queryForObject("select id from campussen where naam='test'", Long.class);
     }
 
+    //personal test
+    @Test void testEquals() {
+        var campus1 = new Campus("TEST", new Adres("test", "test", "test", "test"));
+        var campus2 = new Campus("test", new Adres("test", "test", "test", "test"));
+        assertThat(campus1.equals(campus2)).isTrue();
+    }
+
     @Test
     void create() {
         var campus = new Campus("test", new Adres("test", "test", "test", "test"));

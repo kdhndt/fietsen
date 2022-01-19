@@ -21,8 +21,8 @@ public class Campus {
     @CollectionTable(name = "campussentelefoonnrs", joinColumns = @JoinColumn(name = "campusId"))
     @OrderBy("fax")
     private Set<TelefoonNr> telefoonNrs;
-    @OneToMany
-    @JoinColumn(name = "campusId")
+    //campus verwijst naar de member variable in Docent
+    @OneToMany(mappedBy = "campus")
     @OrderBy("voornaam, familienaam")
     private Set<Docent> docenten;
 
@@ -41,10 +41,15 @@ public class Campus {
     }
 
     public boolean add(Docent docent) {
-        if (docent == null) {
-            throw new NullPointerException();
+        var toegevoegd = docenten.add(docent);
+        var oudeCampus = docent.getCampus();
+        if (oudeCampus != null && oudeCampus != this) {
+            oudeCampus.docenten.remove(docent);
         }
-        return docenten.add(docent);
+        if (this != oudeCampus) {
+            docent.setCampus(this);
+        }
+        return toegevoegd;
     }
 
     //zelf toegevoegd
@@ -69,7 +74,7 @@ public class Campus {
         return Collections.unmodifiableSet(telefoonNrs);
     }
 
-    //todo: test correcte werking? er mogen geen twee campussen met eenzelfd naam worden gemaakt?
+    //equals werking getest, wanneer je equals/hashCode op een string baseert zorg er dan voor dat case genegeerd wordt
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -32,15 +32,17 @@ class JpaCursusRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
     }
 
     private UUID idVanTestGroepCursus() {
-        return jdbcTemplate.queryForObject("select id from groepscursussen where naam = 'testGroep'", UUID.class);
+        return jdbcTemplate.queryForObject("select bin_to_uuid(id) from groepscursussen where naam = 'testGroep'", UUID.class);
     }
 
     private UUID idVanTestIndividueelCursus() {
-        return jdbcTemplate.queryForObject("select id from individuelecursussen where naam = 'testIndividueel'", UUID.class);
+        return jdbcTemplate.queryForObject("select bin_to_uuid(id) from individuelecursussen where naam = 'testIndividueel'", UUID.class);
     }
 
+    //SOLVED: convert binary datatype from Database back to UUID in Java by using the same SQL conversion syntax in your idVanTest... methods
     @Test
     void findGroepCursusById() {
+//        System.out.println(idVanTestGroepCursus());
         assertThat(repository.findById(idVanTestGroepCursus()))
                 .containsInstanceOf(GroepsCursus.class)
                 .hasValueSatisfying(cursus -> assertThat(cursus.getNaam()).isEqualTo("testGroep"));
