@@ -17,6 +17,7 @@ class DocentTest {
     private Docent docent3;
     private Campus campus1;
     private Campus campus2;
+    private Verantwoordelijkheid verantwoordelijkheid1;
 
     @BeforeEach
     void beforeEach() {
@@ -25,7 +26,23 @@ class DocentTest {
         docent2 = new Docent("test2", "test2", WEDDE, "test2@test.be", Geslacht.MAN, campus1);
 //        docent3 = new Docent("test2", "test2", WEDDE, "TEst2@test.be", Geslacht.MAN, campus1);
         campus2 = new Campus("test2", new Adres("test2", "test2", "test2", "test2"));
+        verantwoordelijkheid1 = new Verantwoordelijkheid("EHBO");
     }
+
+    @Test void verantwoordelijkheidToevoegen() {
+        assertThat(docent1.add(verantwoordelijkheid1)).isTrue();
+        assertThat(docent1.getVerantwoordelijkheden()).containsOnly(verantwoordelijkheid1);
+        assertThat(verantwoordelijkheid1.getDocenten()).containsOnly(docent1);
+    }
+
+    @Test void verantwoordelijkheidVerwijderen() {
+        assertThat(docent1.add(verantwoordelijkheid1)).isTrue();
+        assertThat(docent1.remove(verantwoordelijkheid1)).isTrue();
+//        assertThat(docent1.getVerantwoordelijkheden()).doesNotContain(verantwoordelijkheid1);
+        assertThat(docent1.getVerantwoordelijkheden()).isEmpty();
+        assertThat(verantwoordelijkheid1.getDocenten()).isEmpty();
+    }
+
 
     @Test void docent1KomtVoorInCampus1() {
         assertThat(campus1.getDocenten()).contains(docent1);

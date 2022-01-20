@@ -1,9 +1,6 @@
 package be.vdab.fietsen.repositories;
 
-import be.vdab.fietsen.domain.Adres;
-import be.vdab.fietsen.domain.Campus;
-import be.vdab.fietsen.domain.Docent;
-import be.vdab.fietsen.domain.Geslacht;
+import be.vdab.fietsen.domain.*;
 import be.vdab.fietsen.projections.AantalDocentenPerWedde;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest(showSql = false)
 //voorkom dubbel loggen van SQL statements (zie application.properties)
-@Sql({"/insertCampus.sql", "/insertDocent.sql"})
+@Sql({"/insertCampus.sql", "/insertDocent.sql", "/insertVerantwoordelijkheid.sql", "/insertDocentVerantwoordelijkheid.sql"})
 @Import(JpaDocentRepository.class)
 //onderstaande inheritance laat gebruik van de jdbcTemplate hier toe
 class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -29,6 +26,7 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
     private final EntityManager manager;
     private static final String DOCENTEN_BIJNAMEN = "docentenbijnamen";
     private Campus campus;
+    private static final String DOCENTEN_VERANTWOORDELIJKHEDEN = "docentenverantwoordelijkheden";
 
     @BeforeEach
     void beforeEach() {
@@ -48,6 +46,22 @@ class JpaDocentRepositoryTest extends AbstractTransactionalJUnit4SpringContextTe
 
     private long idVanTestVrouw() {
         return jdbcTemplate.queryForObject("select id from docenten where voornaam = 'testV'", Long.class);
+    }
+
+    @Test void verantwoordelijkhedenLezen() {
+        assertThat(repository.findById(idVanTestMan()))
+                .hasValueSatisfying(docent -> assertThat(docent.getVerantwoordelijkheden()).containsOnly(new Verantwoordelijkheid("test")));
+    }
+
+    @Test void verantwoordelijkheidToevoegen() {
+        var verantwoordelijkheid = new Verantwoordelijkheid("test2");
+        manager.persist(verantwoordelijkheid);
+        manager.persist(campus);
+        repository.create(docent);
+        docent.add(verantwoordelijkheid);
+        manager.flush();
+        assertThat(countRowsInTableWhere(DOCENTEN_VERANTWOORDELIJKHEDEN,
+                "docentId=" + docent.getId() + " and verantwoordelijkheidId=" + verantwoordelijkheid.getId())).isOne();
     }
 
     @Test

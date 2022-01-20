@@ -39,6 +39,9 @@ public class Docent {
     @JoinColumn(name = "campusId")
     //datatype Campus, groot verschil met Database (campusId), maar zo heb je toegang tot de campus eigenschappen
     private Campus campus;
+    //associatie wordt voorgesteld aan de andere kant (Verantwoordelijkheid) door de docenten variabele met alle details van de tussentable, dus geef die hier mee met mappedBy
+    @ManyToMany(mappedBy = "docenten")
+    private Set<Verantwoordelijkheid> verantwoordelijkheden = new LinkedHashSet<>();
 
     //zonder id, database maakt die aan, JPA vult hiermee daarna de variabele
     public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht, Campus campus) {
@@ -54,6 +57,26 @@ public class Docent {
     //default constructor (constructor zonder parameters) is nodig omdat we zelf een constructor typen, JPA heeft deze nodig voor zijn interne werking
     //protected volstaat, public kan zorgen voor per ongeluk fouten maken, bv. een leeg Docent object aanmaken
     protected Docent() {
+    }
+
+    public boolean add(Verantwoordelijkheid verantwoordelijkheid) {
+        var toegevoegd = verantwoordelijkheden.add(verantwoordelijkheid);
+        if (!verantwoordelijkheid.getDocenten().contains(this)) {
+            verantwoordelijkheid.add(this);
+        }
+        return toegevoegd;
+    }
+
+    public boolean remove(Verantwoordelijkheid verantwoordelijkheid) {
+        var verwijderd = verantwoordelijkheden.remove(verantwoordelijkheid);
+        if (verantwoordelijkheid.getDocenten().contains(this)) {
+            verantwoordelijkheid.remove(this);
+        }
+        return verwijderd;
+    }
+
+    public Set<Verantwoordelijkheid> getVerantwoordelijkheden() {
+        return Collections.unmodifiableSet(verantwoordelijkheden);
     }
 
     public Campus getCampus() {
