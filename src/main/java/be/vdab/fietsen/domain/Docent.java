@@ -17,6 +17,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "docenten")
+//bij het lezen van een Docent entity uit de Database leest JPA nu ook meteen de bijbehorende Campus entity via een join
+//JPA doet dit echter pas als je dit vraagt, bij het oproepen van een named query?
+@NamedEntityGraph(name = "Docent.metCampus", attributeNodes = @NamedAttributeNode("campus"))
 public class Docent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,6 +87,7 @@ public class Docent {
     }
 
     public void setCampus(Campus campus) {
+        //er gebeuren twee dingen, beide private variabelen in 2 verschillende entities worden aangepast!
         if (!campus.getDocenten().contains(this)) {
             campus.add(this);
         }

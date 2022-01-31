@@ -5,8 +5,9 @@
  http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd" version="2.1">
     <named-query name='Docent.findByWeddeBetween'>
         <query>
-            select d from Docent d
+            select d from Docent d<!-- join fetch d.campus-->
             where d.wedde between :van and :tot
+            order by d.wedde, d.id
         </query>
     </named-query>
     <named-query name='Docent.algemeneOpslag'>

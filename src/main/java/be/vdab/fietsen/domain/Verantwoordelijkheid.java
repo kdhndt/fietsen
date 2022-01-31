@@ -14,9 +14,12 @@ public class Verantwoordelijkheid {
     private long id;
     private String naam;
     @ManyToMany
+    //naam van tussentable
     @JoinTable(
             name = "docentenverantwoordelijkheden",
+            //kolom in tussentable die de FK naar de PK van de huidige (verantwoordelijkheden) table is
             joinColumns = @JoinColumn(name = "verantwoordelijkheidId"),
+            //kolom in tussentable die de FK naar de PK van de entity aan de andere associatie kant (docenten table) is
             inverseJoinColumns = @JoinColumn(name = "docentId"))
     private Set<Docent> docenten = new LinkedHashSet<>();
 

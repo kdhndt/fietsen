@@ -46,6 +46,8 @@ class JpaDocentRepository implements DocentRepository {
 //                manager.createQuery("select d from Docent d where d.wedde between :van and :tot", Docent.class)
                 .setParameter("van", van)
                 .setParameter("tot", tot)
+                //JPA vertaalt de named query naar een SQL select statement met een join tussen docenten en campussen?
+                .setHint("javax.persistence.loadgraph", manager.createEntityGraph("Docent.metCampus"))
                 .getResultList();
     }
 
