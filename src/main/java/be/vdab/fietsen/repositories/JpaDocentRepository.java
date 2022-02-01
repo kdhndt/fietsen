@@ -6,6 +6,7 @@ import be.vdab.fietsen.projections.IdEnEmailAdres;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ class JpaDocentRepository implements DocentRepository {
                 .setParameter("van", van)
                 .setParameter("tot", tot)
                 //JPA vertaalt de named query naar een SQL select statement met een join tussen docenten en campussen?
-                .setHint("javax.persistence.loadgraph", manager.createEntityGraph("Docent.metCampus"))
+                .setHint("javax.persistence.loadgraph", manager.createEntityGraph(/*"Docent.metCampus"*/ Docent.MET_CAMPUS))
                 .getResultList();
     }
 
@@ -79,6 +80,11 @@ class JpaDocentRepository implements DocentRepository {
                 .setParameter("percentage", percentage)
                 //update voert uit en geeft aantal gewijzigd terug
                 .executeUpdate();
+    }
+
+    @Override
+    public Optional<Docent> findByIdWithLock(long id) {
+        return Optional.ofNullable(manager.find(Docent.class, id, LockModeType.PESSIMISTIC_WRITE));
     }
 
 

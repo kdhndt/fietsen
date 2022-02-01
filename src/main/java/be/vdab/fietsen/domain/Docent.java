@@ -3,6 +3,7 @@ package be.vdab.fietsen.domain;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -19,7 +20,7 @@ import java.util.Set;
 @Table(name = "docenten")
 //bij het lezen van een Docent entity uit de Database leest JPA nu ook meteen de bijbehorende Campus entity via een join
 //JPA doet dit echter pas als je dit vraagt, bij het oproepen van een named query?
-@NamedEntityGraph(name = "Docent.metCampus", attributeNodes = @NamedAttributeNode("campus"))
+@NamedEntityGraph(name = /*"Docent.metCampus"*/ Docent.MET_CAMPUS, attributeNodes = @NamedAttributeNode("campus"))
 public class Docent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +46,10 @@ public class Docent {
     //associatie wordt voorgesteld aan de andere kant (Verantwoordelijkheid) door de docenten variabele met alle details van de tussentable, dus geef die hier mee met mappedBy
     @ManyToMany(mappedBy = "docenten")
     private Set<Verantwoordelijkheid> verantwoordelijkheden = new LinkedHashSet<>();
+    public static final String MET_CAMPUS = "Docent.metCampus";
+    //versie controle optimistic locking
+    @Version
+    private Timestamp versie;
 
     //zonder id, database maakt die aan, JPA vult hiermee daarna de variabele
     public Docent(String voornaam, String familienaam, BigDecimal wedde, String emailAdres, Geslacht geslacht, Campus campus) {
