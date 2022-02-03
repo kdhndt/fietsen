@@ -38,7 +38,7 @@ class DefaultDocentServiceIntegrationTest extends AbstractTransactionalJUnit4Spr
     void opslag() {
         var id = idVanTestMan();
         service.opslag(id, BigDecimal.TEN);
-        //JPA doet op deze manier de wijzingen direct (anders worden ze door de EntityManager gespaard om JDBC batch updates samen uit te voeren voor performantie)
+        //JPA doet op deze manier de wijzigingen direct (anders worden ze door de EntityManager gespaard om JDBC batch updates samen uit te voeren voor performantie)
         manager.flush();
         assertThat(countRowsInTableWhere(DOCENTEN, "wedde = 1100 and id =" + id)).isOne();
     }
